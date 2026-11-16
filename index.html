@@ -35,7 +35,8 @@
   .chart span{width:100%;border-radius:8px;background:#2a3639;min-height:6px}
   .chart small{font-size:11px;color:var(--muted)}
   .chart .today span{background:var(--accent)}
-  video{width:100%;border-radius:16px;background:#000;margin-bottom:10px}
+  .yt{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;margin-bottom:10px}
+  .yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .nav{position:fixed;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-around;
        background:#151d1fee;border:1px solid var(--line);border-radius:26px;padding:8px;backdrop-filter:blur(10px)}
   .nav button{flex:1;background:none;border:none;color:var(--muted);font-size:12px;padding:8px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -80,8 +81,7 @@
     <span class="pill" style="border-color:var(--line);color:var(--muted)" id="level">Lvl 1</span>
   </div>
 
-  <video id="video" playsinline controls preload="metadata"
-         src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"></video>
+  <div class="yt"><div id="player"></div></div>
 
   <div class="play" id="playBtn" onclick="togglePlay()">
     <svg viewBox="0 0 100 100" id="playIcon">
@@ -198,12 +198,27 @@ const XP_PER_MIN = 10;                       // 1 daqiqa = 10 XP (pul emas!)
 const xpOf = sec => Math.floor(sec/60)*XP_PER_MIN;
 function vib(){ if (S.vibro && tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); }
 
-/* ---------- Taymer: video o'ynayotganda vaqt yoziladi ---------- */
-const video = $("video");
-let ticker = null;
-video.addEventListener("play",  () => { setIcon(true);  ticker = setInterval(tick, 1000); });
-video.addEventListener("pause", () => { setIcon(false); clearInterval(ticker); save(); });
-video.addEventListener("ended", () => { setIcon(false); clearInterval(ticker); save(); });
+/* ---------- YouTube kanal ---------- */
+// Kanal ID "UC..." bilan boshlanadi. Uning yuklangan videolari ro'yxati "UU..." bo'ladi.
+const CHANNEL_ID = "UCVgMqVoIxt_rrDJWR1k4lpw";   // @ReelHistoryFiles
+const UPLOADS = "UU" + CHANNEL_ID.slice(2);
+
+let player = null, playing = false, ticker = null;
+const ytTag = document.createElement("script");
+ytTag.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(ytTag);
+window.onYouTubeIframeAPIReady = () => {
+  player = new YT.Player("player", {
+    playerVars: { listType: "playlist", list: UPLOADS, playsinline: 1, rel: 0, modestbranding: 1 },
+    events: { onStateChange: e => {
+      const now = e.data === YT.PlayerState.PLAYING;
+      if (now === playing) return;
+      playing = now; setIcon(now);
+      clearInterval(ticker);
+      if (now) ticker = setInterval(tick, 1000); else save();
+    }}
+  });
+};
 function tick(){
   if (document.hidden) return;              // ilova yopiq bo'lsa hisoblamaymiz
   const k = todayKey();
@@ -212,7 +227,7 @@ function tick(){
   if (xpOf(S.days[k]) > before) { vib(); save(); }
   render();
 }
-function togglePlay(){ video.paused ? video.play() : video.pause(); }
+function togglePlay(){ if (!player || !player.playVideo) return; playing ? player.pauseVideo() : player.playVideo(); }
 function setIcon(playing){
   $("playIcon").innerHTML = playing
     ? '<circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/><rect x="38" y="33" width="8" height="34" fill="#6ee6c5"/><rect x="54" y="33" width="8" height="34" fill="#6ee6c5"/>'
