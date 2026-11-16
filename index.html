@@ -5,313 +5,351 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>WatchXP</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0e1416; --card:#182124; --card2:#1d282b; --line:#2a3639;
-    --text:#e9f1f0; --muted:#8fa3a1; --accent:#6ee6c5; --accent2:#3fbf9b; --gold:#e3b95b;
+    --bg:#121110; --surface:#1a1917; --line:#2d2b27; --text:#f1ece3; --muted:#958f85;
+    --gold:#c9a96e; --gold-dim:#c9a96e26; --red:#c46a5a;
+    --serif:"Cormorant Garamond",Georgia,serif; --sans:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{background:radial-gradient(circle at 50% -10%,#1d3a38 0%,var(--bg) 55%);color:var(--text);
-       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:16px 16px 110px}
-  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px}
-  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .muted{color:var(--muted);font-size:13px}
-  .label{letter-spacing:3px;font-size:12px;color:var(--muted);text-transform:uppercase}
-  h1{font-size:44px;font-weight:800}
-  h2{font-size:20px;text-align:center;margin:6px 0 14px}
-  .avatar{width:46px;height:46px;border-radius:50%;background:var(--accent);color:#0e1416;display:grid;place-items:center;font-weight:800;font-size:20px}
-  .icon-btn{width:46px;height:46px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--text);font-size:20px}
-  .pill{display:inline-block;padding:6px 12px;border-radius:999px;border:1px solid var(--accent2);color:var(--accent);font-size:13px;font-weight:600}
-  .play{width:180px;height:180px;border-radius:50%;margin:16px auto;display:grid;place-items:center;
-        background:radial-gradient(circle at 40% 30%,#3a5551,#142022 70%);border:2px solid #2f6b5d;box-shadow:0 0 40px #6ee6c533;cursor:pointer}
-  .play svg{width:80px;height:80px}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
-  .stat b{display:block;font-size:20px;margin-top:4px}
-  .bar{height:6px;background:#0c1213;border-radius:6px;overflow:hidden;margin-top:8px}
-  .bar i{display:block;height:100%;background:var(--accent);width:0%;transition:width .4s}
-  .chart{display:flex;align-items:flex-end;gap:8px;height:90px;margin:14px 0 6px}
-  .chart div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
-  .chart span{width:100%;border-radius:8px;background:#2a3639;min-height:6px}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;min-height:100vh;padding:22px 22px 120px;line-height:1.4}
+  button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+  .page{display:none;animation:fade .35s ease}.page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+  .brand{font-family:var(--serif);font-size:15px;letter-spacing:5px;color:var(--gold)}
+  .avatar{width:38px;height:38px;border-radius:50%;border:1px solid var(--gold);color:var(--gold);display:grid;place-items:center;font-family:var(--serif);font-size:18px}
+  .hello{font-family:var(--serif);font-size:34px;font-weight:500;line-height:1.1}
+  .date{color:var(--muted);font-size:13px;margin:6px 0 22px;letter-spacing:.3px}
+
+  .player{position:relative;width:100%;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#000;border:1px solid var(--line)}
+  .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .controls{display:flex;align-items:center;gap:14px;margin:16px 0 30px}
+  .playbtn{width:52px;height:52px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;transition:.2s}
+  .playbtn:active{background:var(--gold-dim)}
+  .playbtn svg{width:18px;height:18px;fill:var(--gold)}
+  .ctrl-label{font-size:14px;letter-spacing:.3px}
+  .ctrl-sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:6px;opacity:0}
+  .live.on{opacity:1;animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.25}}
+
+  .eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .xp{display:flex;align-items:baseline;gap:8px}
+  .xp b{font-family:var(--serif);font-size:56px;font-weight:500;line-height:1}
+  .xp span{color:var(--gold);font-size:13px;letter-spacing:2px}
+  .lvl{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin:14px 0 6px}
+  .hair{height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+  .hair i{display:block;height:100%;width:0;background:var(--gold);transition:width .6s ease}
+
+  .section{border-top:1px solid var(--line);padding-top:22px;margin-top:28px}
+  .trio{display:grid;grid-template-columns:repeat(3,1fr)}
+  .trio div{padding:0 4px}
+  .trio div+div{border-left:1px solid var(--line);padding-left:16px}
+  .trio small{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+  .trio b{font-family:var(--serif);font-size:26px;font-weight:500}
+
+  .row{display:flex;justify-content:space-between;align-items:baseline}
+  .chart{display:flex;align-items:flex-end;gap:10px;height:96px;margin-top:18px}
+  .chart div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;height:100%}
+  .chart span{width:6px;border-radius:3px;background:var(--line);min-height:4px;transition:height .5s ease}
   .chart small{font-size:11px;color:var(--muted)}
-  .chart .today span{background:var(--accent)}
-  .yt{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;margin-bottom:10px}
-  .yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-  .nav{position:fixed;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-around;
-       background:#151d1fee;border:1px solid var(--line);border-radius:26px;padding:8px;backdrop-filter:blur(10px)}
-  .nav button{flex:1;background:none;border:none;color:var(--muted);font-size:12px;padding:8px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:3px}
-  .nav button.active{background:#1f3a35;color:var(--accent);border:1px solid var(--accent2)}
-  .nav .ic{font-size:20px}
-  .page{display:none}.page.active{display:block}
-  .list-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px}
-  .list-item.sel{background:#1f3a35;border:1px solid var(--accent2)}
-  .code{width:40px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:4px;font-size:12px;font-weight:700;color:var(--muted)}
-  .sel .code{background:var(--accent);color:#0e1416}
-  .switch{width:52px;height:30px;border-radius:30px;background:#2a3639;position:relative;transition:.2s}
-  .switch::after{content:"";position:absolute;width:24px;height:24px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
-  .switch.on{background:var(--accent)}.switch.on::after{left:25px}
-  .btn{width:100%;padding:14px;border-radius:16px;border:none;font-weight:700;font-size:15px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0e1416}
-  .ring{width:70px;height:70px}
-  .hist-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
-  .badge{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .badge div{text-align:center;padding:12px 6px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--muted)}
-  .badge div.got{border-color:var(--gold);color:var(--gold)}
-  .badge div b{display:block;font-size:24px;margin-bottom:4px;filter:grayscale(1);opacity:.4}
-  .badge div.got b{filter:none;opacity:1}
+  .chart .today span{background:var(--gold)}
+  .chart .today small{color:var(--gold)}
+
+  h2{font-family:var(--serif);font-size:36px;font-weight:500;margin:8px 0 26px}
+  .ringwrap{display:flex;align-items:center;gap:22px}
+  .ring{width:120px;height:120px}
+  .ring text{font-family:var(--serif)}
+  .seg{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-top:14px}
+  .seg button{flex:1;padding:9px 0;border-radius:999px;font-size:13px;color:var(--muted)}
+  .seg button.on{background:var(--gold);color:#121110;font-weight:600}
+  .list-row{display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+  .list-row:last-child{border-bottom:none}
+  .mark{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--serif);font-size:14px;color:var(--muted);flex-shrink:0}
+  .got .mark{border-color:var(--gold);color:var(--gold)}
+  .list-row .grow{flex:1}
+  .list-row small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .tag{font-size:11px;letter-spacing:1px;color:var(--muted)}
+  .got .tag{color:var(--gold)}
+  .hist-xp{color:var(--gold);font-size:13px}
+  .empty{color:var(--muted);text-align:center;padding:40px 0;font-family:var(--serif);font-size:20px}
+
+  .check{color:var(--gold);font-size:14px}
+  .switch{width:46px;height:26px;border-radius:26px;border:1px solid var(--line);position:relative;transition:.2s}
+  .switch::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:var(--muted);top:3px;left:3px;transition:.2s}
+  .switch.on{border-color:var(--gold)}.switch.on::after{left:23px;background:var(--gold)}
+  .danger{color:var(--red);font-size:14px;margin-top:30px;padding:10px 0}
+
+  .nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:12px 10px 22px;
+       background:linear-gradient(transparent,var(--bg) 35%)}
+  .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:var(--muted);letter-spacing:.4px}
+  .nav svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .nav button.active{color:var(--gold)}
+  .nav button::after{content:"";width:4px;height:4px;border-radius:50%;background:transparent}
+  .nav button.active::after{background:var(--gold)}
 </style>
 </head>
 <body>
 
-<!-- ============ ASOSIY ============ -->
 <section class="page active" id="home">
-  <div class="row" style="margin-bottom:14px">
-    <div class="row" style="justify-content:flex-start">
-      <div class="avatar" id="avatar">U</div>
-      <b id="username">@user</b>
+  <div class="top">
+    <div class="brand">WATCHXP</div>
+    <div class="avatar" id="avatar">U</div>
+  </div>
+  <div class="hello" id="hello">Xayrli kun</div>
+  <div class="date" id="date"></div>
+
+  <div class="player"><div id="player"></div></div>
+  <div class="controls">
+    <button class="playbtn" onclick="togglePlay()" id="playBtn"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4l13 8-13 8z"/></svg></button>
+    <div>
+      <div class="ctrl-label"><span class="live" id="live"></span><span id="ctrlLabel">Tomosha qilish</span></div>
+      <div class="ctrl-sub" id="ctrlSub">@ReelHistoryFiles</div>
     </div>
-    <button class="icon-btn" onclick="go('settings')">⚙️</button>
   </div>
 
-  <div class="card">
-    <div class="label" data-t="xp">Tajriba ochkolari</div>
-    <div class="row" style="align-items:flex-end;justify-content:flex-start;gap:8px;margin:6px 0 10px">
-      <h1 id="xpTotal">0</h1><span class="muted" style="font-size:18px">XP</span>
-    </div>
-    <span class="pill" id="xpToday">+0 XP</span>
-    <span class="pill" style="border-color:var(--line);color:var(--muted)" id="level">Lvl 1</span>
+  <div class="eyebrow" data-t="xp">Tajriba</div>
+  <div class="xp"><b id="xpTotal">0</b><span>XP</span></div>
+  <div class="lvl"><span id="lvlName">Daraja 1</span><span id="lvlNext"></span></div>
+  <div class="hair"><i id="lvlBar"></i></div>
+
+  <div class="section trio">
+    <div><small data-t="today">Bugun</small><b id="sToday">0m</b></div>
+    <div><small data-t="total">Jami</small><b id="sTotal">0m</b></div>
+    <div><small data-t="streak">Seriya</small><b id="sStreak">0</b></div>
   </div>
 
-  <div class="yt"><div id="player"></div></div>
-
-  <div class="play" id="playBtn" onclick="togglePlay()">
-    <svg viewBox="0 0 100 100" id="playIcon">
-      <circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/>
-      <polygon points="42,32 70,50 42,68" fill="#6ee6c5"/>
-    </svg>
-  </div>
-  <h2 data-t="watchTitle">Ko'ring va o'rganing</h2>
-
-  <div class="stats">
-    <div class="stat"><span class="muted" data-t="today">Bugun</span><b id="sToday">0m</b><div class="bar"><i id="bToday"></i></div></div>
-    <div class="stat"><span class="muted" data-t="total">Jami</span><b id="sTotal">0m</b><div class="bar"><i style="width:100%"></i></div></div>
-    <div class="stat"><span class="muted" data-t="streak">Seriya</span><b id="sStreak">0 🔥</b><div class="bar"><i id="bStreak" style="background:var(--gold)"></i></div></div>
-  </div>
-
-  <div class="card" style="margin-top:12px">
-    <div class="row"><b data-t="week">Hafta</b><b id="weekSum">0m</b></div>
+  <div class="section">
+    <div class="row"><div class="eyebrow" style="margin:0" data-t="week">Shu hafta</div><span class="tag" id="weekSum">0m</span></div>
     <div class="chart" id="chart"></div>
   </div>
 </section>
 
-<!-- ============ MAQSAD ============ -->
 <section class="page" id="goals">
-  <h2 data-t="goals">Maqsadlar</h2>
-  <div class="card row">
-    <svg class="ring" viewBox="0 0 36 36">
-      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#2a3639" stroke-width="3"/>
-      <circle id="ring" cx="18" cy="18" r="15.9" fill="none" stroke="#6ee6c5" stroke-width="3"
-              stroke-dasharray="0 100" stroke-linecap="round" transform="rotate(-90 18 18)"/>
-      <text x="18" y="21" text-anchor="middle" fill="#e9f1f0" font-size="8" id="ringTxt">0%</text>
+  <h2 data-t="goals">Maqsad</h2>
+  <div class="ringwrap">
+    <svg class="ring" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="52" fill="none" stroke="#2d2b27" stroke-width="2"/>
+      <circle id="ring" cx="60" cy="60" r="52" fill="none" stroke="#c9a96e" stroke-width="2" stroke-linecap="round"
+              stroke-dasharray="0 327" transform="rotate(-90 60 60)" style="transition:stroke-dasharray .6s ease"/>
+      <text x="60" y="68" text-anchor="middle" fill="#f1ece3" font-size="28" id="ringTxt">0%</text>
     </svg>
-    <div style="flex:1">
-      <div class="row"><span data-t="dailyGoal">Kunlik maqsad</span><b id="goalTxt">0/30m</b></div>
-      <div class="bar"><i id="bGoal"></i></div>
+    <div>
+      <div class="eyebrow" data-t="dailyGoal">Kunlik maqsad</div>
+      <div style="font-family:var(--serif);font-size:28px" id="goalTxt">0 / 30m</div>
+      <div class="ctrl-sub" id="goalLeft"></div>
     </div>
   </div>
-  <div class="card">
-    <div class="muted" style="margin-bottom:10px" data-t="chooseGoal">Kunlik maqsadni tanlang</div>
-    <div class="row" id="goalBtns"></div>
+  <div class="section" style="margin-top:26px">
+    <div class="eyebrow" data-t="chooseGoal">Maqsadni tanlang</div>
+    <div class="seg" id="goalBtns"></div>
   </div>
-  <div class="card">
-    <b data-t="badges">Nishonlar</b>
-    <div class="badge" style="margin-top:10px" id="badges"></div>
+  <div class="section">
+    <div class="eyebrow" data-t="badges">Nishonlar</div>
+    <div id="badges"></div>
   </div>
 </section>
 
-<!-- ============ TARIX ============ -->
 <section class="page" id="history">
   <h2 data-t="history">Tarix</h2>
-  <div class="card" id="histList"></div>
+  <div id="histList"></div>
 </section>
 
-<!-- ============ SOZLAMALAR ============ -->
 <section class="page" id="settings">
   <h2 data-t="settings">Sozlamalar</h2>
-  <div class="label" style="margin:0 4px 8px" data-t="lang">Til</div>
-  <div class="card" id="langList"></div>
-  <div class="card row">
-    <span data-t="vibro">Tebranish</span>
-    <div class="switch" id="vibroSw" onclick="toggleVibro()"></div>
+  <div class="eyebrow" data-t="lang">Til</div>
+  <div id="langList"></div>
+  <div class="section">
+    <div class="list-row" onclick="toggleVibro()">
+      <div class="grow" data-t="vibro">Tebranish</div>
+      <div class="switch" id="vibroSw"></div>
+    </div>
   </div>
-  <button class="btn" onclick="resetAll()" data-t="reset">Ma'lumotlarni tozalash</button>
+  <button class="danger" onclick="resetAll()" data-t="reset">Ma'lumotlarni tozalash</button>
 </section>
 
 <nav class="nav">
-  <button class="active" data-p="home" onclick="go('home')"><span class="ic">🏠</span><span data-t="nHome">Asosiy</span></button>
-  <button data-p="goals" onclick="go('goals')"><span class="ic">🎯</span><span data-t="nGoals">Maqsad</span></button>
-  <button data-p="history" onclick="go('history')"><span class="ic">🕘</span><span data-t="nHist">Tarix</span></button>
-  <button data-p="settings" onclick="go('settings')"><span class="ic">⚙️</span><span data-t="nSet">Sozlama</span></button>
+  <button class="active" data-p="home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span data-t="nHome">Asosiy</span></button>
+  <button data-p="goals" onclick="go('goals')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span data-t="nGoals">Maqsad</span></button>
+  <button data-p="history" onclick="go('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-t="nHist">Tarix</span></button>
+  <button data-p="settings" onclick="go('settings')"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span data-t="nSet">Sozlama</span></button>
 </nav>
 
 <script>
 /* ---------- Telegram ---------- */
-const tg = window.Telegram ? window.Telegram.WebApp : null;
-if (tg) { tg.ready(); tg.expand(); try{ tg.setHeaderColor('#0e1416'); tg.setBackgroundColor('#0e1416'); }catch(e){} }
-const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+var tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor("#121110"); tg.setBackgroundColor("#121110"); } catch (e) {} }
+var user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
 
 /* ---------- Tarjimalar ---------- */
-const I18N = {
-  uz:{xp:"Tajriba ochkolari",watchTitle:"Ko'ring va o'rganing",today:"Bugun",total:"Jami",streak:"Seriya",week:"Hafta",
-      goals:"Maqsadlar",dailyGoal:"Kunlik maqsad",chooseGoal:"Kunlik maqsadni tanlang",badges:"Nishonlar",history:"Tarix",
-      settings:"Sozlamalar",lang:"Til",vibro:"Tebranish",reset:"Ma'lumotlarni tozalash",nHome:"Asosiy",nGoals:"Maqsad",
-      nHist:"Tarix",nSet:"Sozlama",empty:"Hali tarix yo'q",confirm:"Hammasi o'chirilsinmi?",
-      days:["Ya","Du","Se","Ch","Pa","Ju","Sh"]},
-  ru:{xp:"Очки опыта",watchTitle:"Смотри и учись",today:"Сегодня",total:"Всего",streak:"Серия",week:"Неделя",
-      goals:"Цели",dailyGoal:"Цель дня",chooseGoal:"Выберите цель дня",badges:"Значки",history:"История",
-      settings:"Настройки",lang:"Язык",vibro:"Вибрация",reset:"Сбросить данные",nHome:"Главная",nGoals:"Цели",
-      nHist:"История",nSet:"Настройки",empty:"Истории пока нет",confirm:"Удалить всё?",
-      days:["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]},
-  en:{xp:"Experience points",watchTitle:"Watch and learn",today:"Today",total:"Total",streak:"Streak",week:"Week",
-      goals:"Goals",dailyGoal:"Daily goal",chooseGoal:"Choose a daily goal",badges:"Badges",history:"History",
-      settings:"Settings",lang:"Language",vibro:"Vibration",reset:"Reset data",nHome:"Home",nGoals:"Goals",
-      nHist:"History",nSet:"Settings",empty:"No history yet",confirm:"Delete everything?",
-      days:["Su","Mo","Tu","We","Th","Fr","Sa"]}
+var I18N = {
+  uz: { xp:"Tajriba", level:"Daraja", toNext:"XP keyingi darajagacha", today:"Bugun", total:"Jami", streak:"Seriya", week:"Shu hafta",
+        watch:"Tomosha qilish", pause:"Pauza", counting:"Vaqt hisoblanmoqda",
+        goals:"Maqsad", dailyGoal:"Kunlik maqsad", chooseGoal:"Maqsadni tanlang", badges:"Nishonlar", left:"daqiqa qoldi", done:"Bajarildi",
+        history:"Tarix", empty:"Hali tarix yo'q", settings:"Sozlamalar", lang:"Til", vibro:"Tebranish", reset:"Ma'lumotlarni tozalash",
+        confirm:"Hamma ma'lumot o'chirilsinmi?", nHome:"Asosiy", nGoals:"Maqsad", nHist:"Tarix", nSet:"Sozlama",
+        hello:["Xayrli tong","Xayrli kun","Xayrli kech"], got:"OLINDI", locked:"YOPIQ",
+        wd:["Ya","Du","Se","Ch","Pa","Ju","Sh"],
+        months:["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"],
+        b:[["Birinchi daqiqa","1 daqiqa tomosha"],["Bir soat","Jami 1 soat"],["O'n soat","Jami 10 soat"],["Uch kun","3 kun ketma-ket"],["Bir hafta","7 kun ketma-ket"],["Maqsadga yetdi","Kunlik maqsad bajarildi"]] },
+  ru: { xp:"Опыт", level:"Уровень", toNext:"XP до следующего уровня", today:"Сегодня", total:"Всего", streak:"Серия", week:"Эта неделя",
+        watch:"Смотреть", pause:"Пауза", counting:"Время идёт",
+        goals:"Цель", dailyGoal:"Цель дня", chooseGoal:"Выберите цель", badges:"Значки", left:"мин осталось", done:"Выполнено",
+        history:"История", empty:"Истории пока нет", settings:"Настройки", lang:"Язык", vibro:"Вибрация", reset:"Сбросить данные",
+        confirm:"Удалить все данные?", nHome:"Главная", nGoals:"Цель", nHist:"История", nSet:"Настройки",
+        hello:["Доброе утро","Добрый день","Добрый вечер"], got:"ПОЛУЧЕН", locked:"ЗАКРЫТ",
+        wd:["Вс","Пн","Вт","Ср","Чт","Пт","Сб"],
+        months:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"],
+        b:[["Первая минута","1 минута просмотра"],["Один час","Всего 1 час"],["Десять часов","Всего 10 часов"],["Три дня","3 дня подряд"],["Неделя","7 дней подряд"],["Цель достигнута","Цель дня выполнена"]] },
+  en: { xp:"Experience", level:"Level", toNext:"XP to next level", today:"Today", total:"Total", streak:"Streak", week:"This week",
+        watch:"Watch", pause:"Pause", counting:"Counting time",
+        goals:"Goal", dailyGoal:"Daily goal", chooseGoal:"Choose a goal", badges:"Badges", left:"min left", done:"Done",
+        history:"History", empty:"No history yet", settings:"Settings", lang:"Language", vibro:"Vibration", reset:"Reset data",
+        confirm:"Delete all data?", nHome:"Home", nGoals:"Goal", nHist:"History", nSet:"Settings",
+        hello:["Good morning","Good afternoon","Good evening"], got:"EARNED", locked:"LOCKED",
+        wd:["Su","Mo","Tu","We","Th","Fr","Sa"],
+        months:["January","February","March","April","May","June","July","August","September","October","November","December"],
+        b:[["First minute","Watch for 1 minute"],["One hour","1 hour in total"],["Ten hours","10 hours in total"],["Three days","3 days in a row"],["One week","7 days in a row"],["Goal reached","Daily goal completed"]] }
 };
-const LANGS = [["uz","O'zbekcha"],["ru","Русский"],["en","English"]];
+var LANGS = [["uz","O'zbekcha"],["ru","Русский"],["en","English"]];
 
-/* ---------- Saqlash (har bir foydalanuvchi o'z qurilmasida) ---------- */
-const KEY = "watchxp_v1";
-let S = load();
-function load(){
-  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d) return d; } catch(e){}
-  return { days:{}, goal:30, lang:"uz", vibro:true };   // days: {"2026-11-16": soniyalar}
+/* ---------- Saqlash ---------- */
+var KEY = "watchxp_v1";
+var S = load();
+function load() {
+  try { var d = JSON.parse(localStorage.getItem(KEY)); if (d) return d; } catch (e) {}
+  return { days:{}, goal:30, lang:"uz", vibro:true };
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 /* ---------- Yordamchilar ---------- */
-const $ = id => document.getElementById(id);
-const t = k => (I18N[S.lang]||I18N.uz)[k];
-const dkey = d => d.toISOString().slice(0,10);
-const todayKey = () => dkey(new Date());
-const fmt = sec => { const m=Math.floor(sec/60), h=Math.floor(m/60); return h ? `${h}h ${m%60}m` : `${m}m`; };
-const XP_PER_MIN = 10;                       // 1 daqiqa = 10 XP (pul emas!)
-const xpOf = sec => Math.floor(sec/60)*XP_PER_MIN;
-function vib(){ if (S.vibro && tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); }
+function $(id) { return document.getElementById(id); }
+function t(k) { return (I18N[S.lang] || I18N.uz)[k]; }
+function dkey(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function todayKey() { return dkey(new Date()); }
+function fmt(sec) { var m = Math.floor(sec/60), h = Math.floor(m/60); return h ? h + "h " + (m%60) + "m" : m + "m"; }
+var XP_PER_MIN = 10, XP_PER_LEVEL = 500;
+function xpOf(sec) { return Math.floor(sec/60) * XP_PER_MIN; }
+function vib() { if (S.vibro && tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light"); }
+function niceDate(key) { var p = key.split("-"); return Number(p[2]) + " " + t("months")[Number(p[1])-1]; }
 
 /* ---------- YouTube kanal ---------- */
-// Kanal ID "UC..." bilan boshlanadi. Uning yuklangan videolari ro'yxati "UU..." bo'ladi.
-const CHANNEL_ID = "UCVgMqVoIxt_rrDJWR1k4lpw";   // @ReelHistoryFiles
-const UPLOADS = "UU" + CHANNEL_ID.slice(2);
-
-let player = null, playing = false, ticker = null;
-const ytTag = document.createElement("script");
+var CHANNEL_ID = "UCVgMqVoIxt_rrDJWR1k4lpw";   // @ReelHistoryFiles
+var UPLOADS = "UU" + CHANNEL_ID.slice(2);
+var player = null, playing = false, ticker = null;
+var ytTag = document.createElement("script");
 ytTag.src = "https://www.youtube.com/iframe_api";
 document.head.appendChild(ytTag);
-window.onYouTubeIframeAPIReady = () => {
+window.onYouTubeIframeAPIReady = function () {
   player = new YT.Player("player", {
-    playerVars: { listType: "playlist", list: UPLOADS, playsinline: 1, rel: 0, modestbranding: 1 },
-    events: { onStateChange: e => {
-      const now = e.data === YT.PlayerState.PLAYING;
+    playerVars: { listType:"playlist", list:UPLOADS, playsinline:1, rel:0, modestbranding:1 },
+    events: { onStateChange: function (e) {
+      var now = e.data === YT.PlayerState.PLAYING;
       if (now === playing) return;
-      playing = now; setIcon(now);
+      playing = now; setPlaying(now);
       clearInterval(ticker);
       if (now) ticker = setInterval(tick, 1000); else save();
-    }}
+    } }
   });
 };
-function tick(){
-  if (document.hidden) return;              // ilova yopiq bo'lsa hisoblamaymiz
-  const k = todayKey();
-  const before = xpOf(S.days[k]||0);
-  S.days[k] = (S.days[k]||0) + 1;
+function togglePlay() { if (!player || !player.playVideo) return; if (playing) player.pauseVideo(); else player.playVideo(); vib(); }
+function setPlaying(on) {
+  $("playIcon").innerHTML = on ? '<path d="M7 4h3v16H7zM14 4h3v16h-3z"/>' : '<path d="M7 4l13 8-13 8z"/>';
+  $("live").classList.toggle("on", on);
+  $("ctrlLabel").textContent = on ? t("counting") : t("watch");
+}
+function tick() {
+  if (document.hidden) return;
+  var k = todayKey(), before = xpOf(S.days[k] || 0);
+  S.days[k] = (S.days[k] || 0) + 1;
   if (xpOf(S.days[k]) > before) { vib(); save(); }
   render();
 }
-function togglePlay(){ if (!player || !player.playVideo) return; playing ? player.pauseVideo() : player.playVideo(); }
-function setIcon(playing){
-  $("playIcon").innerHTML = playing
-    ? '<circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/><rect x="38" y="33" width="8" height="34" fill="#6ee6c5"/><rect x="54" y="33" width="8" height="34" fill="#6ee6c5"/>'
-    : '<circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/><polygon points="42,32 70,50 42,68" fill="#6ee6c5"/>';
-}
 
-/* ---------- Hisob-kitob ---------- */
-function totals(){
-  const total = Object.values(S.days).reduce((a,b)=>a+b,0);
-  const today = S.days[todayKey()]||0;
-  let streak = 0; const d = new Date();
+/* ---------- Hisob ---------- */
+function totals() {
+  var total = 0; for (var k in S.days) total += S.days[k];
+  var today = S.days[todayKey()] || 0, streak = 0, d = new Date();
   if (!S.days[dkey(d)]) d.setDate(d.getDate()-1);
-  while (S.days[dkey(d)] >= 60) { streak++; d.setDate(d.getDate()-1); }   // kuniga kamida 1 daqiqa
-  return { total, today, streak };
+  while ((S.days[dkey(d)] || 0) >= 60) { streak++; d.setDate(d.getDate()-1); }
+  return { total:total, today:today, streak:streak };
 }
 
 /* ---------- Chizish ---------- */
-function render(){
-  const {total,today,streak} = totals();
-  const xp = xpOf(total);
-  $("xpTotal").textContent = xp.toLocaleString();
-  $("xpToday").textContent = `+${xpOf(today)} XP`;
-  $("level").textContent = `Lvl ${1+Math.floor(xp/500)}`;
-  $("sToday").textContent = fmt(today);
-  $("sTotal").textContent = fmt(total);
-  $("sStreak").textContent = `${streak} 🔥`;
-  const pct = Math.min(100, Math.round(today/(S.goal*60)*100));
-  $("bToday").style.width = pct+"%";
-  $("bStreak").style.width = Math.min(100, streak/7*100)+"%";
+function render() {
+  var T = totals(), xp = xpOf(T.total), lvl = 1 + Math.floor(xp / XP_PER_LEVEL), inLvl = xp % XP_PER_LEVEL;
+  var h = new Date().getHours();
+  var name = user ? (user.first_name || "") : "";
+  $("hello").textContent = t("hello")[h < 12 ? 0 : h < 18 ? 1 : 2] + (name ? ", " + name : "");
+  $("date").textContent = niceDate(todayKey());
+  $("xpTotal").textContent = xp.toLocaleString("ru-RU");
+  $("lvlName").textContent = t("level") + " " + lvl;
+  $("lvlNext").textContent = (XP_PER_LEVEL - inLvl) + " " + t("toNext");
+  $("lvlBar").style.width = (inLvl / XP_PER_LEVEL * 100) + "%";
+  $("sToday").textContent = fmt(T.today);
+  $("sTotal").textContent = fmt(T.total);
+  $("sStreak").textContent = T.streak;
+  if (!playing) $("ctrlLabel").textContent = t("watch");
 
-  // Haftalik grafik
-  const days = []; let sum = 0;
-  for (let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const v=S.days[dkey(d)]||0; sum+=v; days.push([d,v,i===0]); }
-  const max = Math.max(60, ...days.map(x=>x[1]));
-  $("chart").innerHTML = days.map(([d,v,isT]) =>
-    `<div class="${isT?'today':''}"><span style="height:${Math.max(6,v/max*70)}px"></span><small>${t('days')[d.getDay()]}</small></div>`).join("");
+  var days = [], sum = 0, i, d, v;
+  for (i = 6; i >= 0; i--) { d = new Date(); d.setDate(d.getDate()-i); v = S.days[dkey(d)] || 0; sum += v; days.push([d, v, i === 0]); }
+  var max = 60; days.forEach(function (x) { if (x[1] > max) max = x[1]; });
+  $("chart").innerHTML = days.map(function (x) {
+    return '<div class="' + (x[2] ? "today" : "") + '"><span style="height:' + Math.max(4, x[1]/max*70) + 'px"></span><small>' + t("wd")[x[0].getDay()] + "</small></div>";
+  }).join("");
   $("weekSum").textContent = fmt(sum);
 
-  // Maqsad
-  $("ring").setAttribute("stroke-dasharray", `${pct} 100`);
-  $("ringTxt").textContent = pct+"%";
-  $("goalTxt").textContent = `${Math.floor(today/60)}/${S.goal}m`;
-  $("bGoal").style.width = pct+"%";
-  $("goalBtns").innerHTML = [10,30,60,120].map(g =>
-    `<button class="pill" style="flex:1;background:${S.goal===g?'#1f3a35':'none'}" onclick="setGoal(${g})">${g}m</button>`).join("");
+  var pct = Math.min(100, Math.round(T.today / (S.goal*60) * 100));
+  $("ring").setAttribute("stroke-dasharray", (pct * 3.27) + " 327");
+  $("ringTxt").textContent = pct + "%";
+  $("goalTxt").textContent = Math.floor(T.today/60) + " / " + S.goal + "m";
+  var leftMin = Math.max(0, S.goal - Math.floor(T.today/60));
+  $("goalLeft").textContent = leftMin ? leftMin + " " + t("left") : t("done");
+  $("goalBtns").innerHTML = [10,30,60,120].map(function (g) {
+    return '<button class="' + (S.goal === g ? "on" : "") + '" onclick="setGoal(' + g + ')">' + g + "m</button>";
+  }).join("");
 
-  // Nishonlar
-  const B = [["🎬","1m",total>=60],["⏱️","1h",total>=3600],["🏆","10h",total>=36000],
-             ["🔥","3d",streak>=3],["⚡","7d",streak>=7],["🎯","Goal",pct>=100]];
-  $("badges").innerHTML = B.map(([e,l,ok]) => `<div class="${ok?'got':''}"><b>${e}</b>${l}</div>`).join("");
+  var ok = [T.total >= 60, T.total >= 3600, T.total >= 36000, T.streak >= 3, T.streak >= 7, pct >= 100];
+  var marks = ["I","II","III","3","7","&#10003;"];
+  $("badges").innerHTML = t("b").map(function (b, j) {
+    return '<div class="list-row ' + (ok[j] ? "got" : "") + '"><div class="mark">' + marks[j] + '</div><div class="grow">' + b[0] + "<small>" + b[1] + '</small></div><span class="tag">' + (ok[j] ? t("got") : t("locked")) + "</span></div>";
+  }).join("");
 
-  // Tarix
-  const hist = Object.entries(S.days).sort((a,b)=>b[0].localeCompare(a[0]));
-  $("histList").innerHTML = hist.length
-    ? hist.map(([d,v]) => `<div class="hist-item"><span>${d}</span><span>${fmt(v)} · <b style="color:var(--accent)">+${xpOf(v)} XP</b></span></div>`).join("")
-    : `<div class="muted" style="text-align:center">${t('empty')}</div>`;
+  var hist = Object.keys(S.days).sort().reverse();
+  $("histList").innerHTML = hist.length ? hist.map(function (k) {
+    return '<div class="list-row"><div class="grow" style="font-family:var(--serif);font-size:19px">' + niceDate(k) + "<small>" + fmt(S.days[k]) + '</small></div><span class="hist-xp">+' + xpOf(S.days[k]) + " XP</span></div>";
+  }).join("") : '<div class="empty">' + t("empty") + "</div>";
 
-  // Sozlamalar
-  $("langList").innerHTML = LANGS.map(([c,n]) =>
-    `<div class="list-item ${S.lang===c?'sel':''}" onclick="setLang('${c}')"><span class="code">${c.toUpperCase()}</span><span style="flex:1">${n}</span>${S.lang===c?'✓':''}</div>`).join("");
+  $("langList").innerHTML = LANGS.map(function (l) {
+    return '<div class="list-row" onclick="setLang(\'' + l[0] + '\')"><div class="grow">' + l[1] + "</div>" + (S.lang === l[0] ? '<span class="check">&#10003;</span>' : "") + "</div>";
+  }).join("");
   $("vibroSw").classList.toggle("on", S.vibro);
 
-  document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
 }
 
 /* ---------- Harakatlar ---------- */
-function go(p){
-  document.querySelectorAll(".page").forEach(s => s.classList.toggle("active", s.id===p));
-  document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.p===p));
-  window.scrollTo(0,0); vib();
+function go(p) {
+  document.querySelectorAll(".page").forEach(function (s) { s.classList.toggle("active", s.id === p); });
+  document.querySelectorAll(".nav button").forEach(function (b) { b.classList.toggle("active", b.dataset.p === p); });
+  window.scrollTo(0, 0); vib();
 }
-function setGoal(g){ S.goal=g; save(); render(); vib(); }
-function setLang(l){ S.lang=l; save(); render(); vib(); }
-function toggleVibro(){ S.vibro=!S.vibro; save(); render(); vib(); }
-function resetAll(){
-  const doReset = ok => { if(!ok) return; S = {days:{},goal:30,lang:S.lang,vibro:S.vibro}; save(); render(); };
-  if (tg && tg.showConfirm) tg.showConfirm(t('confirm'), doReset); else doReset(confirm(t('confirm')));
+function setGoal(g) { S.goal = g; save(); render(); vib(); }
+function setLang(l) { S.lang = l; save(); render(); vib(); }
+function toggleVibro() { S.vibro = !S.vibro; save(); render(); vib(); }
+function resetAll() {
+  var doReset = function (ok) { if (!ok) return; S = { days:{}, goal:30, lang:S.lang, vibro:S.vibro }; save(); render(); };
+  if (tg && tg.showConfirm) tg.showConfirm(t("confirm"), doReset); else doReset(confirm(t("confirm")));
 }
 
 /* ---------- Boshlash ---------- */
-if (user){
-  $("username").textContent = user.username ? "@"+user.username : user.first_name;
-  $("avatar").textContent = (user.first_name||"U")[0].toUpperCase();
-  if (!localStorage.getItem(KEY) && ["ru","en","uz"].includes(user.language_code)) S.lang = user.language_code;
+if (user) {
+  $("avatar").textContent = (user.first_name || "U")[0].toUpperCase();
+  if (!localStorage.getItem(KEY) && I18N[user.language_code]) S.lang = user.language_code;
 }
 render();
 </script>
