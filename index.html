@@ -1,0 +1,305 @@
+test
+  line2 ${x} `a`<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>WatchXP</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg:#0e1416; --card:#182124; --card2:#1d282b; --line:#2a3639;
+    --text:#e9f1f0; --muted:#8fa3a1; --accent:#6ee6c5; --accent2:#3fbf9b; --gold:#e3b95b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:radial-gradient(circle at 50% -10%,#1d3a38 0%,var(--bg) 55%);color:var(--text);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:16px 16px 110px}
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .muted{color:var(--muted);font-size:13px}
+  .label{letter-spacing:3px;font-size:12px;color:var(--muted);text-transform:uppercase}
+  h1{font-size:44px;font-weight:800}
+  h2{font-size:20px;text-align:center;margin:6px 0 14px}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--accent);color:#0e1416;display:grid;place-items:center;font-weight:800;font-size:20px}
+  .icon-btn{width:46px;height:46px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--text);font-size:20px}
+  .pill{display:inline-block;padding:6px 12px;border-radius:999px;border:1px solid var(--accent2);color:var(--accent);font-size:13px;font-weight:600}
+  .play{width:180px;height:180px;border-radius:50%;margin:16px auto;display:grid;place-items:center;
+        background:radial-gradient(circle at 40% 30%,#3a5551,#142022 70%);border:2px solid #2f6b5d;box-shadow:0 0 40px #6ee6c533;cursor:pointer}
+  .play svg{width:80px;height:80px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+  .stat b{display:block;font-size:20px;margin-top:4px}
+  .bar{height:6px;background:#0c1213;border-radius:6px;overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;background:var(--accent);width:0%;transition:width .4s}
+  .chart{display:flex;align-items:flex-end;gap:8px;height:90px;margin:14px 0 6px}
+  .chart div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .chart span{width:100%;border-radius:8px;background:#2a3639;min-height:6px}
+  .chart small{font-size:11px;color:var(--muted)}
+  .chart .today span{background:var(--accent)}
+  video{width:100%;border-radius:16px;background:#000;margin-bottom:10px}
+  .nav{position:fixed;left:12px;right:12px;bottom:14px;display:flex;justify-content:space-around;
+       background:#151d1fee;border:1px solid var(--line);border-radius:26px;padding:8px;backdrop-filter:blur(10px)}
+  .nav button{flex:1;background:none;border:none;color:var(--muted);font-size:12px;padding:8px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .nav button.active{background:#1f3a35;color:var(--accent);border:1px solid var(--accent2)}
+  .nav .ic{font-size:20px}
+  .page{display:none}.page.active{display:block}
+  .list-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px}
+  .list-item.sel{background:#1f3a35;border:1px solid var(--accent2)}
+  .code{width:40px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:4px;font-size:12px;font-weight:700;color:var(--muted)}
+  .sel .code{background:var(--accent);color:#0e1416}
+  .switch{width:52px;height:30px;border-radius:30px;background:#2a3639;position:relative;transition:.2s}
+  .switch::after{content:"";position:absolute;width:24px;height:24px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+  .switch.on{background:var(--accent)}.switch.on::after{left:25px}
+  .btn{width:100%;padding:14px;border-radius:16px;border:none;font-weight:700;font-size:15px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0e1416}
+  .ring{width:70px;height:70px}
+  .hist-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .badge{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .badge div{text-align:center;padding:12px 6px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .badge div.got{border-color:var(--gold);color:var(--gold)}
+  .badge div b{display:block;font-size:24px;margin-bottom:4px;filter:grayscale(1);opacity:.4}
+  .badge div.got b{filter:none;opacity:1}
+</style>
+</head>
+<body>
+
+<!-- ============ ASOSIY ============ -->
+<section class="page active" id="home">
+  <div class="row" style="margin-bottom:14px">
+    <div class="row" style="justify-content:flex-start">
+      <div class="avatar" id="avatar">U</div>
+      <b id="username">@user</b>
+    </div>
+    <button class="icon-btn" onclick="go('settings')">⚙️</button>
+  </div>
+
+  <div class="card">
+    <div class="label" data-t="xp">Tajriba ochkolari</div>
+    <div class="row" style="align-items:flex-end;justify-content:flex-start;gap:8px;margin:6px 0 10px">
+      <h1 id="xpTotal">0</h1><span class="muted" style="font-size:18px">XP</span>
+    </div>
+    <span class="pill" id="xpToday">+0 XP</span>
+    <span class="pill" style="border-color:var(--line);color:var(--muted)" id="level">Lvl 1</span>
+  </div>
+
+  <video id="video" playsinline controls preload="metadata"
+         src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"></video>
+
+  <div class="play" id="playBtn" onclick="togglePlay()">
+    <svg viewBox="0 0 100 100" id="playIcon">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/>
+      <polygon points="42,32 70,50 42,68" fill="#6ee6c5"/>
+    </svg>
+  </div>
+  <h2 data-t="watchTitle">Ko'ring va o'rganing</h2>
+
+  <div class="stats">
+    <div class="stat"><span class="muted" data-t="today">Bugun</span><b id="sToday">0m</b><div class="bar"><i id="bToday"></i></div></div>
+    <div class="stat"><span class="muted" data-t="total">Jami</span><b id="sTotal">0m</b><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="stat"><span class="muted" data-t="streak">Seriya</span><b id="sStreak">0 🔥</b><div class="bar"><i id="bStreak" style="background:var(--gold)"></i></div></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="row"><b data-t="week">Hafta</b><b id="weekSum">0m</b></div>
+    <div class="chart" id="chart"></div>
+  </div>
+</section>
+
+<!-- ============ MAQSAD ============ -->
+<section class="page" id="goals">
+  <h2 data-t="goals">Maqsadlar</h2>
+  <div class="card row">
+    <svg class="ring" viewBox="0 0 36 36">
+      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#2a3639" stroke-width="3"/>
+      <circle id="ring" cx="18" cy="18" r="15.9" fill="none" stroke="#6ee6c5" stroke-width="3"
+              stroke-dasharray="0 100" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+      <text x="18" y="21" text-anchor="middle" fill="#e9f1f0" font-size="8" id="ringTxt">0%</text>
+    </svg>
+    <div style="flex:1">
+      <div class="row"><span data-t="dailyGoal">Kunlik maqsad</span><b id="goalTxt">0/30m</b></div>
+      <div class="bar"><i id="bGoal"></i></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="muted" style="margin-bottom:10px" data-t="chooseGoal">Kunlik maqsadni tanlang</div>
+    <div class="row" id="goalBtns"></div>
+  </div>
+  <div class="card">
+    <b data-t="badges">Nishonlar</b>
+    <div class="badge" style="margin-top:10px" id="badges"></div>
+  </div>
+</section>
+
+<!-- ============ TARIX ============ -->
+<section class="page" id="history">
+  <h2 data-t="history">Tarix</h2>
+  <div class="card" id="histList"></div>
+</section>
+
+<!-- ============ SOZLAMALAR ============ -->
+<section class="page" id="settings">
+  <h2 data-t="settings">Sozlamalar</h2>
+  <div class="label" style="margin:0 4px 8px" data-t="lang">Til</div>
+  <div class="card" id="langList"></div>
+  <div class="card row">
+    <span data-t="vibro">Tebranish</span>
+    <div class="switch" id="vibroSw" onclick="toggleVibro()"></div>
+  </div>
+  <button class="btn" onclick="resetAll()" data-t="reset">Ma'lumotlarni tozalash</button>
+</section>
+
+<nav class="nav">
+  <button class="active" data-p="home" onclick="go('home')"><span class="ic">🏠</span><span data-t="nHome">Asosiy</span></button>
+  <button data-p="goals" onclick="go('goals')"><span class="ic">🎯</span><span data-t="nGoals">Maqsad</span></button>
+  <button data-p="history" onclick="go('history')"><span class="ic">🕘</span><span data-t="nHist">Tarix</span></button>
+  <button data-p="settings" onclick="go('settings')"><span class="ic">⚙️</span><span data-t="nSet">Sozlama</span></button>
+</nav>
+
+<script>
+/* ---------- Telegram ---------- */
+const tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { tg.ready(); tg.expand(); try{ tg.setHeaderColor('#0e1416'); tg.setBackgroundColor('#0e1416'); }catch(e){} }
+const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+
+/* ---------- Tarjimalar ---------- */
+const I18N = {
+  uz:{xp:"Tajriba ochkolari",watchTitle:"Ko'ring va o'rganing",today:"Bugun",total:"Jami",streak:"Seriya",week:"Hafta",
+      goals:"Maqsadlar",dailyGoal:"Kunlik maqsad",chooseGoal:"Kunlik maqsadni tanlang",badges:"Nishonlar",history:"Tarix",
+      settings:"Sozlamalar",lang:"Til",vibro:"Tebranish",reset:"Ma'lumotlarni tozalash",nHome:"Asosiy",nGoals:"Maqsad",
+      nHist:"Tarix",nSet:"Sozlama",empty:"Hali tarix yo'q",confirm:"Hammasi o'chirilsinmi?",
+      days:["Ya","Du","Se","Ch","Pa","Ju","Sh"]},
+  ru:{xp:"Очки опыта",watchTitle:"Смотри и учись",today:"Сегодня",total:"Всего",streak:"Серия",week:"Неделя",
+      goals:"Цели",dailyGoal:"Цель дня",chooseGoal:"Выберите цель дня",badges:"Значки",history:"История",
+      settings:"Настройки",lang:"Язык",vibro:"Вибрация",reset:"Сбросить данные",nHome:"Главная",nGoals:"Цели",
+      nHist:"История",nSet:"Настройки",empty:"Истории пока нет",confirm:"Удалить всё?",
+      days:["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]},
+  en:{xp:"Experience points",watchTitle:"Watch and learn",today:"Today",total:"Total",streak:"Streak",week:"Week",
+      goals:"Goals",dailyGoal:"Daily goal",chooseGoal:"Choose a daily goal",badges:"Badges",history:"History",
+      settings:"Settings",lang:"Language",vibro:"Vibration",reset:"Reset data",nHome:"Home",nGoals:"Goals",
+      nHist:"History",nSet:"Settings",empty:"No history yet",confirm:"Delete everything?",
+      days:["Su","Mo","Tu","We","Th","Fr","Sa"]}
+};
+const LANGS = [["uz","O'zbekcha"],["ru","Русский"],["en","English"]];
+
+/* ---------- Saqlash (har bir foydalanuvchi o'z qurilmasida) ---------- */
+const KEY = "watchxp_v1";
+let S = load();
+function load(){
+  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d) return d; } catch(e){}
+  return { days:{}, goal:30, lang:"uz", vibro:true };   // days: {"2026-11-16": soniyalar}
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ---------- Yordamchilar ---------- */
+const $ = id => document.getElementById(id);
+const t = k => (I18N[S.lang]||I18N.uz)[k];
+const dkey = d => d.toISOString().slice(0,10);
+const todayKey = () => dkey(new Date());
+const fmt = sec => { const m=Math.floor(sec/60), h=Math.floor(m/60); return h ? `${h}h ${m%60}m` : `${m}m`; };
+const XP_PER_MIN = 10;                       // 1 daqiqa = 10 XP (pul emas!)
+const xpOf = sec => Math.floor(sec/60)*XP_PER_MIN;
+function vib(){ if (S.vibro && tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); }
+
+/* ---------- Taymer: video o'ynayotganda vaqt yoziladi ---------- */
+const video = $("video");
+let ticker = null;
+video.addEventListener("play",  () => { setIcon(true);  ticker = setInterval(tick, 1000); });
+video.addEventListener("pause", () => { setIcon(false); clearInterval(ticker); save(); });
+video.addEventListener("ended", () => { setIcon(false); clearInterval(ticker); save(); });
+function tick(){
+  if (document.hidden) return;              // ilova yopiq bo'lsa hisoblamaymiz
+  const k = todayKey();
+  const before = xpOf(S.days[k]||0);
+  S.days[k] = (S.days[k]||0) + 1;
+  if (xpOf(S.days[k]) > before) { vib(); save(); }
+  render();
+}
+function togglePlay(){ video.paused ? video.play() : video.pause(); }
+function setIcon(playing){
+  $("playIcon").innerHTML = playing
+    ? '<circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/><rect x="38" y="33" width="8" height="34" fill="#6ee6c5"/><rect x="54" y="33" width="8" height="34" fill="#6ee6c5"/>'
+    : '<circle cx="50" cy="50" r="40" fill="none" stroke="#6ee6c5" stroke-width="8"/><polygon points="42,32 70,50 42,68" fill="#6ee6c5"/>';
+}
+
+/* ---------- Hisob-kitob ---------- */
+function totals(){
+  const total = Object.values(S.days).reduce((a,b)=>a+b,0);
+  const today = S.days[todayKey()]||0;
+  let streak = 0; const d = new Date();
+  if (!S.days[dkey(d)]) d.setDate(d.getDate()-1);
+  while (S.days[dkey(d)] >= 60) { streak++; d.setDate(d.getDate()-1); }   // kuniga kamida 1 daqiqa
+  return { total, today, streak };
+}
+
+/* ---------- Chizish ---------- */
+function render(){
+  const {total,today,streak} = totals();
+  const xp = xpOf(total);
+  $("xpTotal").textContent = xp.toLocaleString();
+  $("xpToday").textContent = `+${xpOf(today)} XP`;
+  $("level").textContent = `Lvl ${1+Math.floor(xp/500)}`;
+  $("sToday").textContent = fmt(today);
+  $("sTotal").textContent = fmt(total);
+  $("sStreak").textContent = `${streak} 🔥`;
+  const pct = Math.min(100, Math.round(today/(S.goal*60)*100));
+  $("bToday").style.width = pct+"%";
+  $("bStreak").style.width = Math.min(100, streak/7*100)+"%";
+
+  // Haftalik grafik
+  const days = []; let sum = 0;
+  for (let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const v=S.days[dkey(d)]||0; sum+=v; days.push([d,v,i===0]); }
+  const max = Math.max(60, ...days.map(x=>x[1]));
+  $("chart").innerHTML = days.map(([d,v,isT]) =>
+    `<div class="${isT?'today':''}"><span style="height:${Math.max(6,v/max*70)}px"></span><small>${t('days')[d.getDay()]}</small></div>`).join("");
+  $("weekSum").textContent = fmt(sum);
+
+  // Maqsad
+  $("ring").setAttribute("stroke-dasharray", `${pct} 100`);
+  $("ringTxt").textContent = pct+"%";
+  $("goalTxt").textContent = `${Math.floor(today/60)}/${S.goal}m`;
+  $("bGoal").style.width = pct+"%";
+  $("goalBtns").innerHTML = [10,30,60,120].map(g =>
+    `<button class="pill" style="flex:1;background:${S.goal===g?'#1f3a35':'none'}" onclick="setGoal(${g})">${g}m</button>`).join("");
+
+  // Nishonlar
+  const B = [["🎬","1m",total>=60],["⏱️","1h",total>=3600],["🏆","10h",total>=36000],
+             ["🔥","3d",streak>=3],["⚡","7d",streak>=7],["🎯","Goal",pct>=100]];
+  $("badges").innerHTML = B.map(([e,l,ok]) => `<div class="${ok?'got':''}"><b>${e}</b>${l}</div>`).join("");
+
+  // Tarix
+  const hist = Object.entries(S.days).sort((a,b)=>b[0].localeCompare(a[0]));
+  $("histList").innerHTML = hist.length
+    ? hist.map(([d,v]) => `<div class="hist-item"><span>${d}</span><span>${fmt(v)} · <b style="color:var(--accent)">+${xpOf(v)} XP</b></span></div>`).join("")
+    : `<div class="muted" style="text-align:center">${t('empty')}</div>`;
+
+  // Sozlamalar
+  $("langList").innerHTML = LANGS.map(([c,n]) =>
+    `<div class="list-item ${S.lang===c?'sel':''}" onclick="setLang('${c}')"><span class="code">${c.toUpperCase()}</span><span style="flex:1">${n}</span>${S.lang===c?'✓':''}</div>`).join("");
+  $("vibroSw").classList.toggle("on", S.vibro);
+
+  document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+}
+
+/* ---------- Harakatlar ---------- */
+function go(p){
+  document.querySelectorAll(".page").forEach(s => s.classList.toggle("active", s.id===p));
+  document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("active", b.dataset.p===p));
+  window.scrollTo(0,0); vib();
+}
+function setGoal(g){ S.goal=g; save(); render(); vib(); }
+function setLang(l){ S.lang=l; save(); render(); vib(); }
+function toggleVibro(){ S.vibro=!S.vibro; save(); render(); vib(); }
+function resetAll(){
+  const doReset = ok => { if(!ok) return; S = {days:{},goal:30,lang:S.lang,vibro:S.vibro}; save(); render(); };
+  if (tg && tg.showConfirm) tg.showConfirm(t('confirm'), doReset); else doReset(confirm(t('confirm')));
+}
+
+/* ---------- Boshlash ---------- */
+if (user){
+  $("username").textContent = user.username ? "@"+user.username : user.first_name;
+  $("avatar").textContent = (user.first_name||"U")[0].toUpperCase();
+  if (!localStorage.getItem(KEY) && ["ru","en","uz"].includes(user.language_code)) S.lang = user.language_code;
+}
+render();
+</script>
+</body>
+</html>
